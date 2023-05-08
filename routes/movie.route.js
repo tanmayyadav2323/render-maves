@@ -7,6 +7,7 @@ const { Comment, Reply } = require("../models/comment.model");
 const Category = require("../models/category.model");
 const MongoClient = require('mongodb').MongoClient;
 const Movieview = require("../models/movieview.model");
+const Watch = require("../models/watchlist.model");
 
 movieRouter.get("/api/trending-movies", async (req, res, next) => {
     try {
@@ -335,6 +336,46 @@ movieRouter.post("/api/rate-movie", async (req, res, next) => {
             movieview.rating = averageRating;
             await movieview.save();
         }
+        res.json({});
+    } catch (e) {
+        console.log(e);
+        res.status(500).json({ error: e.message });
+    }
+});
+
+movieRouter.post("/api/add-watch", async (req, res, next) => {
+    try {
+        const movieId = req.body.movieId;
+        const userId = req.body.userId;
+        Watch.findOne({ userId: userId }, (err, watch) => {
+            if (err) {
+                res.status(500).json({ error: err });
+            } else if (watch) {
+                // If a watch object with the given userId already exists, add the new movieId to its movieId list
+                watch.movieId.push(movieId);
+                watch.save((err) => {
+                    if (err) {
+                        res.status(500).json({ error: err });
+                    } else {
+                        res.json({ message: `Added movieId ${movieId} to existing Watch object with userId ${userId}` });
+                    }
+                });
+            } else {
+                // If no watch object with the given userId exists, create a new one
+                let newWatch = new Watch({
+                    userId: userId,
+                    movieId: [movieId]
+                });
+                newWatch.save((err) => {
+                    if (err) {
+                        res.status(500).json({ error: err });
+                    } else {
+                        res.json({ message: `Created new Watch object with userId ${userId} and movieId ${movieId}` });
+                    }
+                });
+            }
+        });
+
         res.json({});
     } catch (e) {
         console.log(e);

@@ -5,7 +5,7 @@ const reply = new Schema(
         name: String,
         imageUrl: String,
         userId: String,
-
+        description: String
     },
     { timestamps: true }
 );
