@@ -383,5 +383,18 @@ movieRouter.post("/api/add-watch", async (req, res, next) => {
     }
 });
 
+movieRouter.get('/api/watch/:userId/movies', (req, res) => {
+    const userId = req.params.userId;
+  
+    Watch.find({ userId: userId }, (err, watches) => {
+      if (err) {
+        res.status(500).json({ error: err });
+      } else {
+        const movieIds = watches.map(watch => watch.movieId);
+        res.json({ movieIds: movieIds });
+      }
+    });
+  });
+
 
 module.exports = movieRouter;
