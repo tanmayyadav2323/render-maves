@@ -392,6 +392,7 @@ movieRouter.get('/api/watch/:userId/movies', (req, res) => {
         } else {
             const movieIds = watches.map(watch => watch.movieId);
             res.json(movieIds);
+            
         }
     });
 
